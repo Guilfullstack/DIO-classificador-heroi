@@ -9,10 +9,6 @@ let classeHeroi = definirClasse(xpHeroi);
 let continuar = true;
 //inicio 
 console.log("O Herói de nome " + nomeHeroi + " está no nível de: " + classeHeroi);
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 
 function definirClasse(xp) {
     if (xp < 1000) {
@@ -34,26 +30,38 @@ function definirClasse(xp) {
     }
 }
 
-function adicionarXP() {
-    rl.question('Deseja adicionar XP? (y/n): ', (resposta) => {
-        if (resposta.toLowerCase() === 'y') {
-            rl.question("Informe a quantidade de XP ganha: ",(xp)=>{
-                xpHeroi += parseInt(xp);
-                console.log(`XP adicionada. Novo total de XP: ${xpHeroi}`);
-                classeHeroi = definirClasse(xpHeroi);
-                console.log("O Herói de nome " + nomeHeroi + " está no nível de: " + classeHeroi+"\n");
-                adicionarXP(); 
-            });
-        } else if(resposta.toLowerCase() === 'n'){
-            console.log("Encerrando o programa...");
-            continuar = false;
-            rl.close();
-        }else {
-            console.log("Opção invalida tente novamente...\n");
-            adicionarXP();
-        }
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+function pergunta(texto) {
+    return new Promise((resolve, reject) => {
+        rl.question(texto, (resposta) => {
+            resolve(resposta);
+        });
     });
 }
 
+async function adicionarXP() {
+    do{
+        resposta = await pergunta('Deseja adicionar XP? (y/n): ');
+        if (resposta.toLowerCase() === 'y') {
+            let xp = await pergunta("Informe a quantidade de XP ganha: ");
+            xpHeroi += parseInt(xp);
+            console.log(`XP adicionada. Novo total de XP: ${xpHeroi}`);
+            classeHeroi = definirClasse(xpHeroi);
+            console.log("O Herói de nome " + nomeHeroi + " está no nível de: " + classeHeroi + "\n");
+            continuar=true
+        } else if (resposta.toLowerCase() == 'n') {
+            console.log("Encerrando o programa...");
+            rl.close();
+            break;
+        }else{
+            console.log("Opção inválida. Tente novamente...\n");
+            continuar=true
+        }
+    }while(continuar)
+}
 
 adicionarXP();
